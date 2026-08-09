@@ -1,0 +1,12 @@
+.env
+.env.*
+!.env.example
+data/
+secrets/
+*.key
+*.pem
+*.p12
+*.pfx
+*.tar
+*.tar.gz
+*.zip
