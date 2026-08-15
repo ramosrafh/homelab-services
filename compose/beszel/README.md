@@ -1,24 +1,15 @@
 # Beszel
 
-Monitoramento de servidores: hub (dashboard web) + agente local.
-
-## Primeiro deploy
-
 ```bash
-cp .env.example .env
-# edite APP_URL no .env
-docker network create proxy  # se ainda não existir
-docker compose up -d beszel
+../../bin/homelab-services init beszel
+../../bin/homelab-services up beszel
 ```
 
-Acesse o `APP_URL`, crie o usuário admin, clique em **Add System** e copie `TOKEN` e `KEY` para o `.env`. Depois:
+Abra `http://beszel.rafh.io`, crie o usuário administrador e, em **Add
+System**, copie `TOKEN` e `KEY` para o `.env`. Em seguida:
 
 ```bash
-docker compose --profile agent up -d
+../../bin/homelab-services agent beszel
 ```
 
-Use `/beszel_socket/beszel.sock` como Host/IP ao adicionar o sistema no hub.
-
-## Agentes remotos
-
-Em cada host, rode `henrygd/beszel-agent` com `LISTEN=0.0.0.0:45876` e o `KEY` gerado no hub. Porta 45876/TCP deve ser alcançável pelo hub.
+Use `/beszel_socket/beszel.sock` como Host/IP ao adicionar o sistema local.

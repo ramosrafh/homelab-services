@@ -1,33 +1,33 @@
 services:
   beszel:
-    image: henrygd/beszel:latest
+    image: ${BESZEL_IMAGE:-henrygd/beszel:latest}
     container_name: beszel
     restart: unless-stopped
+    ports:
+      - "127.0.0.1:8090:8090"
     volumes:
-      - ./data/hub:/beszel_data
-      - ./data/socket:/beszel_socket
+      - ${HOMELAB_DATA_ROOT}/services/beszel/hub:/beszel_data
+      - ${HOMELAB_DATA_ROOT}/services/beszel/socket:/beszel_socket
     environment:
-      APP_URL: ${APP_URL}
+      APP_URL: ${BESZEL_APP_URL}
     healthcheck:
       test: [CMD, /beszel, health, --url, "http://localhost:8090"]
       interval: 120s
       start_period: 10s
       timeout: 5s
-    networks:
-      - proxy
 
   beszel-agent:
-    image: henrygd/beszel-agent:latest
+    image: ${BESZEL_AGENT_IMAGE:-henrygd/beszel-agent:latest}
     container_name: beszel-agent
     restart: unless-stopped
     network_mode: host
     volumes:
-      - ./data/agent:/var/lib/beszel-agent
-      - ./data/socket:/beszel_socket
+      - ${HOMELAB_DATA_ROOT}/services/beszel/agent:/var/lib/beszel-agent
+      - ${HOMELAB_DATA_ROOT}/services/beszel/socket:/beszel_socket
       - /var/run/docker.sock:/var/run/docker.sock:ro
     environment:
       LISTEN: /beszel_socket/beszel.sock
-      HUB_URL: http://localhost:8090
+      HUB_URL: http://127.0.0.1:8090
       TOKEN: ${AGENT_TOKEN}
       KEY: ${AGENT_KEY}
     healthcheck:
@@ -35,9 +35,4 @@ services:
       interval: 120s
       start_period: 10s
       timeout: 5s
-    profiles:
-      - agent
-
-networks:
-  proxy:
-    external: true
+    profiles: [ "agent" ]

@@ -1,0 +1,88 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+die() {
+  echo "Erro: $*" >&2
+  exit 1
+}
+
+repo_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+data_root=/srv/homelab
+stacks=(beszel uptime-kuma vaultwarden)
+
+usage() {
+  cat <<'EOF'
+Uso: ./bin/homelab-services <init|up|agent|down|logs|status> [stack]
+
+Stacks: beszel, uptime-kuma, vaultwarden
+EOF
+}
+
+stack_dir() {
+  local stack=$1
+  [[ " ${stacks[*]} " == *" $stack "* ]] || die "stack desconhecida: $stack"
+  printf '%s/compose/%s\n' "$repo_dir" "$stack"
+}
+
+require_storage() {
+  mountpoint -q "$data_root" || die "$data_root não está montado"
+}
+
+compose() {
+  local stack=$1
+  shift
+  local dir
+  dir=$(stack_dir "$stack")
+  docker compose --env-file "$dir/.env" -f "$dir/compose.yml" "$@"
+}
+
+compose_with_profile() {
+  local stack=$1
+  local profile=$2
+  shift 2
+  local dir
+  dir=$(stack_dir "$stack")
+  docker compose --env-file "$dir/.env" -f "$dir/compose.yml" --profile "$profile" "$@"
+}
+
+command=${1:-}
+case "$command" in
+  init)
+    stack=${2:-}
+    [[ -n "$stack" ]] || die "informe uma stack"
+    dir=$(stack_dir "$stack")
+    [[ -f "$dir/.env" ]] && die "$dir/.env já existe"
+    cp "$dir/.env.example" "$dir/.env"
+    echo "Criado $dir/.env; revise os valores antes de iniciar."
+    ;;
+  up|down|logs)
+    stack=${2:-}
+    [[ -n "$stack" ]] || die "informe uma stack"
+    require_storage
+    case "$command" in
+      up) compose "$stack" up -d ;;
+      down) compose "$stack" down ;;
+      logs) compose "$stack" logs --tail=100 -f ;;
+    esac
+    ;;
+  agent)
+    stack=${2:-}
+    [[ "$stack" == "beszel" ]] || die "agent disponível apenas para beszel"
+    require_storage
+    compose_with_profile beszel agent up -d
+    ;;
+  status)
+    require_storage
+    for stack in "${stacks[@]}"; do
+      dir=$(stack_dir "$stack")
+      [[ -f "$dir/.env" ]] || continue
+      echo "[$stack]"
+      compose "$stack" ps
+    done
+    ;;
+  *)
+    usage
+    exit 1
+    ;;
+esac
