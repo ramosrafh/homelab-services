@@ -1,0 +1,36 @@
+services:
+  qwen-server:
+    image: ${LLAMA_SERVER_IMAGE:-ghcr.io/ggerganov/llama.cpp:server-rocm}
+    container_name: qwen-ai-server
+    restart: unless-stopped
+    # Passa a placa AMD (ROCm) ao container
+    devices:
+      - /dev/kfd:/dev/kfd
+      - /dev/dri:/dev/dri
+    volumes:
+      - ${QWEN_MODELS_DIR}:/models
+    ports:
+      - "8080:8080"
+    environment:
+      HSA_OVERRIDE_GFX_VERSION: "11.0.0"
+    command:
+      - -m
+      - /models/unsloth-qwen3.6-35b-a3b-q6_k-mtp.gguf
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8080"
+      - -c
+      - "131072"
+      - -b
+      - "512"
+      - -ngl
+      - "41"
+      - -t
+      - "31"
+      - -fa
+      - --draft-mtp
+      - --draft
+      - "2"
+      - --kv-cache-type
+      - q8_0

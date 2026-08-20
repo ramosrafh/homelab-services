@@ -9,13 +9,13 @@ die() {
 
 repo_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
 data_root=/srv/homelab
-stacks=(beszel uptime-kuma vaultwarden)
+stacks=(beszel uptime-kuma vaultwarden qwen-ai-server)
 
 usage() {
   cat <<'EOF'
 Uso: ./bin/homelab-services <init|up|agent|down|logs|status> [stack]
 
-Stacks: beszel, uptime-kuma, vaultwarden
+Stacks: beszel, uptime-kuma, vaultwarden, qwen-ai-server
 EOF
 }
 

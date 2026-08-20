@@ -25,7 +25,7 @@ O primeiro comando deve mostrar o SSD externo e o segundo deve mostrar
 ./bin/homelab-services down uptime-kuma
 ```
 
-Stacks disponíveis agora: `beszel`, `uptime-kuma` e `vaultwarden`.
+Stacks disponíveis agora: `beszel`, `uptime-kuma`, `vaultwarden` e `qwen-ai-server`.
 
 Dados persistentes e segredos ficam fora deste repositório:
 
