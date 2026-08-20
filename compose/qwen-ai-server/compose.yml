@@ -1,36 +1,31 @@
 services:
   qwen-server:
-    image: ${LLAMA_SERVER_IMAGE:-ghcr.io/ggerganov/llama.cpp:server-rocm}
+    image: koboldai/koboldcpp:rocm
     container_name: qwen-ai-server
     restart: unless-stopped
-    # Passa a placa AMD (ROCm) ao container
+    # Mapeamento da GPU AMD (RX 7800 XT)
     devices:
       - /dev/kfd:/dev/kfd
       - /dev/dri:/dev/dri
+    # O diretório do NixOS onde o modelo está
     volumes:
-      - ${QWEN_MODELS_DIR}:/models
+      - /var/lib/ai-models/qwen:/models
     ports:
       - "8080:8080"
     environment:
-      HSA_OVERRIDE_GFX_VERSION: "11.0.0"
-    command:
-      - -m
-      - /models/unsloth-qwen3.6-35b-a3b-q6_k-mtp.gguf
-      - --host
-      - 0.0.0.0
-      - --port
-      - "8080"
-      - -c
-      - "131072"
-      - -b
-      - "512"
-      - -ngl
-      - "41"
-      - -t
-      - "31"
-      - -fa
-      - --draft-mtp
-      - --draft
-      - "2"
-      - --kv-cache-type
-      - q8_0
+      # O truque vital para a 7800 XT continuar funcionando
+      - HSA_OVERRIDE_GFX_VERSION=11.0.0
+    # Tradução exata das flags do fórum para o Koboldcpp
+    command: [
+      "--model", "/models/unsloth-qwen3.6-35b-a3b-q6_k-mtp.gguf",
+      "--host", "0.0.0.0",
+      "--port", "8080",
+      "--usecublas",       # No Koboldcpp ROCm, essa flag ativa a aceleração HIP da AMD
+      "--gpulayers", "41", # ngl: 41
+      "--contextsize", "131072", # ctx: 131072
+      "--batchsize", "512", # ub: 512
+      "--threads", "31",    # Equivalente ao ncpumoe: 31
+      "--flashattention",   # fa: on
+      "--quantkv", "2",     # kvcache: q8 (No Kobold, 2 significa 8-bit)
+      "--nommap"            # loadmode: none (Garante que não dê o erro de munmap_chunk)
+    ]
