@@ -3,8 +3,9 @@ services:
     image: node:22
     container_name: dsh
     restart: unless-stopped
-    ports:
-      - "127.0.0.1:3080:3080"
+    # O DSH exige loopback por segurança. Com a rede do host, 127.0.0.1:3080
+    # continua privado e o Caddy local consegue encaminhar para ele.
+    network_mode: host
     volumes:
       - ${HOMELAB_DATA_ROOT}/services/dsh:/home/node
     environment:
@@ -16,6 +17,6 @@ services:
       - --yes
       - "@deepseek-ai/dsh@0.1.0-rc.7"
       - web
-      - --host
-      - 0.0.0.0
+      - --trusted-host
+      - dsh.rafh.io
       - --no-open
