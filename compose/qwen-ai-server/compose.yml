@@ -4,9 +4,9 @@ services:
       context: .
       dockerfile_inline: |
         FROM ubuntu:22.04
-        RUN apt-get update && apt-get install -y wget libgomp1 pciutils ca-certificates
-        # Baixando direto dos servidores de alta velocidade do GitHub
-        RUN wget -q --show-progress -c https://github.com/LostRuins/koboldcpp/releases/latest/download/koboldcpp-linux-x64-rocm -O /usr/local/bin/koboldcpp
+        RUN apt-get update && apt-get install -y curl libgomp1 pciutils ca-certificates
+        # Baixando do atalho oficial do KoboldAI
+        RUN curl -L https://koboldai.org/cpplinuxrocm -o /usr/local/bin/koboldcpp
         RUN chmod +x /usr/local/bin/koboldcpp
         ENTRYPOINT ["/usr/local/bin/koboldcpp"]
     container_name: qwen-ai-server
