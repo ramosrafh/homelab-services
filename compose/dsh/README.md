@@ -1,8 +1,8 @@
 # DeepSeek Harness (dsh)
 
-Harness de agentes (`dsh`) rodando como stack no servidor. Expose uma Web UI en
-`127.0.0.1:3080` (port aerial a Caddy, netBird), pero a IA come dela **no es
-local**: aponta ao modelo ROCm que corre no desktop (Qwen via llama.cpp).
+Harness de agentes (`dsh`) rodando como stack no servidor. A Web UI escuta
+somente em `127.0.0.1:3080` e é acessada pelo Caddy através do NetBird. O modelo
+Qwen roda no desktop com ROCm e é consumido pelo servidor através da API.
 
 ```bash
 ../../bin/homelab-services init dsh
@@ -26,14 +26,12 @@ router recarrega o modelo solicitado na GPU.
 
 - Web UI: `https://dsh.rafh.io` pela VPN NetBird. A porta 3080 permanece presa
   a `127.0.0.1`; somente o Caddy a alcança.
-- `dsh` está em *dev preview*: na primeira corrida registra p/providers/plugins y
-  config pror.
-- O harness apenas do consumo via API; a GPU sigue no desktop, o server não a
-  requiere.
+- O `dsh` está em *dev preview*.
+- O harness apenas consome a API; a GPU continua no desktop.
 
 ## Notas
 
-- Stack só serve do harness UI; arquivo de estado em
-  `/srv/homelab/services/dsh` (fuera do repo).
-- Como corre via `npx @deepseek-ai/dsh`, o container baixa os deps na primeira
-  execução. Para um deploy fixo conviene un Dockerfile que haga build previo.
+- Estado e workspace ficam em `/srv/homelab/services/dsh`, fora do repositório.
+- O primeiro início baixa o DSH e pode levar alguns minutos. O cache do `npx`
+  fica persistido em `/srv/homelab/services/dsh/npm-cache`, então os próximos
+  inícios são rápidos.
