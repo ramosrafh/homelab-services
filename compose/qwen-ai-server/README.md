@@ -1,13 +1,14 @@
 # Qwen AI server (llama.cpp + ROCm)
 
 ```bash
-../../bin/homelab-services init qwen-ai-server
-../../bin/homelab-services up qwen-ai-server
+cp .env.example .env
+docker compose --env-file .env up -d
 ```
 
-Serve o modelo Unsloth Qwen3.6 35B A3B via llama.cpp compilado para AMD ROCm
-(`server-rocm`), aproveitando a GPU RX 7800 XT do desktop. Não passa por Caddy;
-os pares NetBird acessam direto na porta `8080`.
+Serve `unsloth-qwen3.8-27b-ud-q3_k_xl.gguf` com a imagem ROCm oficial do
+`llama.cpp`, aproveitando a RX 7800 XT do desktop. A API OpenAI-compatible
+fica na porta `8080`; o firewall do desktop aceita essa porta apenas em `wt0`
+(NetBird), nunca pela LAN ou Internet.
 
 ## Pré-requisito: modelo
 
@@ -16,19 +17,22 @@ Coloque antes de iniciar:
 ```bash
 sudo mkdir -p /var/lib/ai-models/qwen
 cd /var/lib/ai-models/qwen
-# descarga aquí `unsloth-qwen3.6-35b-a3b-q6_k-mtp.gguf`
+# baixe aqui `unsloth-qwen3.8-27b-ud-q3_k_xl.gguf`
 ```
 
-Ajuste `QWEN_MODELS_DIR` no `.env` se os modelos estão em outro lugar.
+O perfil inicial usa todas as camadas na GPU, Flash Attention e contexto de
+8192 tokens. É o ponto de partida seguro para 16 GB de VRAM. Só aumente
+`QWEN_CONTEXT_SIZE` depois de confirmar que a carga e a geração estão estáveis.
 
 ## Probar
 
 ```bash
 curl http://127.0.0.1:8080/v1/models
-curl http://<IP-mesh-desk>:8080/v1/models   # desde outro pares via NetBird
+curl http://<IP-NetBird-do-desk>:8080/v1/models
 ```
 
 ## Notas ROCm
 
 - `HSA_OVERRIDE_GFX_VERSION=11.0.0` é necessário para RDNA3 (7800 XT / gfx1100).
-- Contexto `-c 131072` e quantização `--kv-cache-type q8_0`.
+- Não use `--no-mmap`: o mapeamento de arquivo reduz pressão na RAM durante a
+  carga do GGUF.

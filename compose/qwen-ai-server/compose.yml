@@ -1,35 +1,30 @@
 services:
   qwen-server:
-    build:
-      context: .
-      dockerfile_inline: |
-        FROM ubuntu:22.04
-        RUN apt-get update && apt-get install -y curl libgomp1 pciutils ca-certificates
-        # Baixando do atalho oficial do KoboldAI
-        RUN curl -L https://koboldai.org/cpplinuxrocm -o /usr/local/bin/koboldcpp
-        RUN chmod +x /usr/local/bin/koboldcpp
-        ENTRYPOINT ["/usr/local/bin/koboldcpp"]
+    image: ${LLAMA_SERVER_IMAGE:-ghcr.io/ggerganov/llama.cpp:server-rocm}
     container_name: qwen-ai-server
     restart: unless-stopped
     devices:
       - /dev/kfd:/dev/kfd
       - /dev/dri:/dev/dri
     volumes:
-      - /var/lib/ai-models/qwen:/models
+      - ${QWEN_MODELS_DIR}:/models:ro
     ports:
       - "8080:8080"
     environment:
-      - HSA_OVERRIDE_GFX_VERSION=11.0.0
-    command: [
-      "--model", "/models/unsloth-qwen3.6-35b-a3b-q6_k-mtp.gguf",
-      "--host", "0.0.0.0",
-      "--port", "8080",
-      "--usecublas",
-      "--gpulayers", "41",
-      "--contextsize", "131072",
-      "--batchsize", "512",
-      "--threads", "31",
-      "--flashattention",
-      "--quantkv", "2",
-      "--nommap"
-    ]
+      HSA_OVERRIDE_GFX_VERSION: "11.0.0"
+    command:
+      - --model
+      - /models/${QWEN_MODEL_FILE}
+      - --alias
+      - ${QWEN_MODEL_ID}
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8080"
+      - --gpu-layers
+      - "999"
+      - --ctx-size
+      - ${QWEN_CONTEXT_SIZE:-8192}
+      - --flash-attn
+      - on
+      - --jinja

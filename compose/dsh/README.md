@@ -17,7 +17,7 @@ O Qwen precisa estar ativo no desktop primeiro:
 curl http://<IP-NetBird-do-desk>:8080/v1/models
 ```
 
-Anote o id devolto (ex: `unsloth-qwen3.6-35b-a3b-q6_k-mtp`) e ajuste
+Anote o id devolto (ex: `unsloth-qwen3.8-27b-ud-q3_k_xl`) e ajuste
 `DSH_LLM_MODEL` (e `DSH_LLM_BASE_URL` co IP mesh do desk) no `.env`.
 
 ## Uso
