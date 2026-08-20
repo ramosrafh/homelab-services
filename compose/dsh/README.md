@@ -17,7 +17,7 @@ O Qwen precisa estar ativo no desktop primeiro:
 curl http://<IP-NetBird-do-desk>:8080/v1/models
 ```
 
-O router do desktop expõe `qwen-q3` (8192 tokens) e `qwen-q2` (16384 tokens).
+O router do desktop expõe `qwen-q3` (16384 tokens) e `qwen-q2` (65536 tokens).
 Defina `DSH_LLM_MODEL` com um deles e `DSH_LLM_BASE_URL` com o IP NetBird do
 desktop no `.env`. Ao trocar esse valor, reinicie somente a stack `dsh`; o
 router recarrega o modelo solicitado na GPU.

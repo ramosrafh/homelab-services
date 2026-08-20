@@ -37,8 +37,8 @@ settings['llm-pi-ai'] = {
         maxTokensField: 'max_tokens',
       },
       models: [
-        { id: 'qwen-q3', name: 'Qwen 3.8 27B Q3', contextWindow: 8192 },
-        { id: 'qwen-q2', name: 'Qwen 3.8 27B Q2', contextWindow: 16384 },
+        { id: 'qwen-q3', name: 'Qwen 3.8 27B Q3', contextWindow: 16384 },
+        { id: 'qwen-q2', name: 'Qwen 3.8 27B Q2', contextWindow: 65536 },
       ],
     },
   },
