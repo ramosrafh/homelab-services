@@ -1,6 +1,6 @@
 services:
   qwen-server:
-    image: ${LLAMA_SERVER_IMAGE:-ghcr.io/ggerganov/llama.cpp:server-rocm}
+    image: ${LLAMA_SERVER_IMAGE:-ghcr.io/ggml-org/llama.cpp:server-rocm}
     container_name: qwen-ai-server
     restart: unless-stopped
     devices:
@@ -8,20 +8,18 @@ services:
       - /dev/dri:/dev/dri
     volumes:
       - ${QWEN_MODELS_DIR}:/models:ro
+      - ./models.ini:/config/models.ini:ro
     ports:
       - "8080:8080"
     environment:
       HSA_OVERRIDE_GFX_VERSION: "11.0.0"
     command:
-      - --model
-      - /models/${QWEN_MODEL_FILE}
-      - --alias
-      - ${QWEN_MODEL_ID}
       - --host
       - 0.0.0.0
       - --port
       - "8080"
-      - --gpu-layers
-      - "999"
-      - --ctx-size
-      - ${QWEN_CONTEXT_SIZE:-8192}
+      - --models-preset
+      - /config/models.ini
+      # The RX 7800 XT cannot keep both 27B variants resident at once.
+      - --models-max
+      - "1"
