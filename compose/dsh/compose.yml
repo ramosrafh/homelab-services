@@ -20,7 +20,7 @@ services:
       - |
         mkdir -p /data/state /data/workspace /data/npm-cache
         cd /data/workspace
-        exec npx --yes --loglevel=http @deepseek-ai/dsh@0.1.0-rc.7 web --trusted-host dsh.rafh.io --no-open
+        exec npx --yes --loglevel=http --before=2026-08-20T00:00:00Z @deepseek-ai/dsh@0.1.0-rc.8 web --trusted-host dsh.rafh.io --no-open
     healthcheck:
       test:
         - CMD
