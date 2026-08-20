@@ -25,6 +25,3 @@ services:
       - "999"
       - --ctx-size
       - ${QWEN_CONTEXT_SIZE:-8192}
-      - --flash-attn
-      - on
-      - --jinja

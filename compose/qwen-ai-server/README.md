@@ -10,6 +10,9 @@ Serve `unsloth-qwen3.8-27b-ud-q3_k_xl.gguf` com a imagem ROCm oficial do
 fica na porta `8080`; o firewall do desktop aceita essa porta apenas em `wt0`
 (NetBird), nunca pela LAN ou Internet.
 
+Use `ghcr.io/ggml-org/llama.cpp:server-rocm`. Imagens antigas do namespace
+`ggerganov` não reconhecem a arquitetura `qwen35` desse GGUF.
+
 ## Pré-requisito: modelo
 
 Coloque antes de iniciar:
@@ -20,8 +23,9 @@ cd /var/lib/ai-models/qwen
 # baixe aqui `unsloth-qwen3.8-27b-ud-q3_k_xl.gguf`
 ```
 
-O perfil inicial usa todas as camadas na GPU, Flash Attention e contexto de
-8192 tokens. É o ponto de partida seguro para 16 GB de VRAM. Só aumente
+O perfil inicial usa todas as camadas na GPU e contexto de 8192 tokens. O
+template de chat é lido automaticamente dos metadados do GGUF. É o ponto de
+partida seguro para 16 GB de VRAM. Só aumente
 `QWEN_CONTEXT_SIZE` depois de confirmar que a carga e a geração estão estáveis.
 
 ## Probar
