@@ -24,8 +24,8 @@ router recarrega o modelo solicitado na GPU.
 
 ## Uso
 
-- Web UI local: `http://127.0.0.1:3080` (via Caddy: `http://harness.rafh.io` se
-  config rearado).
+- Web UI: `https://dsh.rafh.io` pela VPN NetBird. A porta 3080 permanece presa
+  a `127.0.0.1`; somente o Caddy a alcança.
 - `dsh` está em *dev preview*: na primeira corrida registra p/providers/plugins y
   config pror.
 - O harness apenas do consumo via API; a GPU sigue no desktop, o server não a

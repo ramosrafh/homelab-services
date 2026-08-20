@@ -12,9 +12,8 @@ services:
       DSH_LLM_BASE_URL: ${DSH_LLM_BASE_URL}
       DSH_LLM_MODEL: ${DSH_LLM_MODEL}
     command:
-      - npm
-      - exec
       - npx
-      - "@deepseek-ai/dsh"
+      - --yes
+      - "@deepseek-ai/dsh@0.1.0-rc.7"
       - web
       - --no-open
