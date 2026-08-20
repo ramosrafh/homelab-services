@@ -1,0 +1,3 @@
+- id: settings
+  config:
+    path: /data/state/settings.json

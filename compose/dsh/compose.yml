@@ -8,9 +8,14 @@ services:
     network_mode: host
     volumes:
       - ${HOMELAB_DATA_ROOT}/services/dsh:/data
+      - ./configure.mjs:/config/configure.mjs:ro
+      - ./dsh.patch.yml:/config/dsh.patch.yml:ro
     environment:
       DSH_HOME: /data/state
       NPM_CONFIG_CACHE: /data/npm-cache
+      # O llama.cpp não exige chave, mas o adapter OpenAI-compatible do DSH
+      # requer uma credencial não vazia. Este valor é apenas um placeholder.
+      LOCAL_QWEN_API_KEY: local
       # Aponta ao modelo ROCm do desk pela rede NetBird.
       DSH_LLM_BASE_URL: ${DSH_LLM_BASE_URL}
       DSH_LLM_MODEL: ${DSH_LLM_MODEL}
@@ -19,8 +24,9 @@ services:
       - -c
       - |
         mkdir -p /data/state /data/workspace /data/npm-cache
+        node /config/configure.mjs
         cd /data/workspace
-        exec npx --yes --loglevel=http --before=2026-08-20T00:00:00Z @deepseek-ai/dsh@0.1.0-rc.8 web --trusted-host dsh.rafh.io --no-open
+        exec npx --yes --loglevel=http --before=2026-08-20T00:00:00Z @deepseek-ai/dsh@0.1.0-rc.8 web --patch /config/dsh.patch.yml --trusted-host dsh.rafh.io --no-open
     healthcheck:
       test:
         - CMD

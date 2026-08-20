@@ -22,6 +22,11 @@ Defina `DSH_LLM_MODEL` com um deles e `DSH_LLM_BASE_URL` com o IP NetBird do
 desktop no `.env`. Ao trocar esse valor, reinicie somente a stack `dsh`; o
 router recarrega o modelo solicitado na GPU.
 
+A stack registra os dois modelos no provider `local-qwen`. O valor de
+`DSH_LLM_MODEL` é usado somente como escolha inicial; uma troca feita pelo
+seletor de modelos do DSH fica persistida em
+`/srv/homelab/services/dsh/state/settings.json`.
+
 ## Uso
 
 - Web UI: `https://dsh.rafh.io` pela VPN NetBird. A porta 3080 permanece presa
