@@ -1,31 +1,36 @@
 services:
   qwen-server:
-    image: koboldai/koboldcpp:rocm
+    build:
+      context: .
+      # O Docker Compose vai "fabricar" a imagem ROCm na hora
+      dockerfile_inline: |
+        FROM ubuntu:22.04
+        RUN apt-get update && apt-get install -y wget libgomp1 pciutils
+        # Baixa a versão Rolling Release do KoboldCpp com suporte nativo a AMD
+        RUN wget -q --show-progress -c https://sourceforge.net/projects/koboldcpp/files/rocm-rolling/koboldcpp-linux-x64-rocm/download -O /usr/local/bin/koboldcpp
+        RUN chmod +x /usr/local/bin/koboldcpp
+        ENTRYPOINT ["/usr/local/bin/koboldcpp"]
     container_name: qwen-ai-server
     restart: unless-stopped
-    # Mapeamento da GPU AMD (RX 7800 XT)
     devices:
       - /dev/kfd:/dev/kfd
       - /dev/dri:/dev/dri
-    # O diretório do NixOS onde o modelo está
     volumes:
       - /var/lib/ai-models/qwen:/models
     ports:
       - "8080:8080"
     environment:
-      # O truque vital para a 7800 XT continuar funcionando
       - HSA_OVERRIDE_GFX_VERSION=11.0.0
-    # Tradução exata das flags do fórum para o Koboldcpp
     command: [
       "--model", "/models/unsloth-qwen3.6-35b-a3b-q6_k-mtp.gguf",
       "--host", "0.0.0.0",
       "--port", "8080",
-      "--usecublas",       # No Koboldcpp ROCm, essa flag ativa a aceleração HIP da AMD
-      "--gpulayers", "41", # ngl: 41
-      "--contextsize", "131072", # ctx: 131072
-      "--batchsize", "512", # ub: 512
-      "--threads", "31",    # Equivalente ao ncpumoe: 31
-      "--flashattention",   # fa: on
-      "--quantkv", "2",     # kvcache: q8 (No Kobold, 2 significa 8-bit)
-      "--nommap"            # loadmode: none (Garante que não dê o erro de munmap_chunk)
+      "--usecublas",       # Flag que ativa a GPU (HIP/ROCm) no KoboldCpp
+      "--gpulayers", "41",
+      "--contextsize", "131072",
+      "--batchsize", "512",
+      "--threads", "31",
+      "--flashattention",
+      "--quantkv", "2",
+      "--nommap"
     ]
