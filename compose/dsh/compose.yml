@@ -16,4 +16,6 @@ services:
       - --yes
       - "@deepseek-ai/dsh@0.1.0-rc.7"
       - web
+      - --host
+      - 0.0.0.0
       - --no-open
